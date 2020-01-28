@@ -34,14 +34,38 @@ class PaketController extends Controller
         return view('paket-list', compact('kdoutput'));
     }
 
+    public function wilayah(Request $request)
+    {
+        if (request()->ajax()) {
+            if ($request->kdwilayah) {
+                $data = DB::table('satker')
+                    ->join('balai', 'satker.balai_id', '=', 'balai.id')
+                    ->join('wilayah', 'balai.wilayah_id', '=', 'wilayah.id')
+                    ->select('wilayah.id', 'wilayah.nmwilayah', 'balai.id', 'balai.nmbalai', 'satker.nmsatker')
+                    ->where('balai.wilayah_id', $request->kdwilayah);
+            } else {
+                $data = DB::table('satker')
+                    ->join('balai', 'satker.balai_id', '=', 'balai.id')
+                    ->join('wilayah', 'balai.wilayah_id', '=', 'wilayah.id')
+                    ->select('wilayah.id', 'wilayah.nmwilayah', 'balai.id', 'balai.nmbalai', 'satker.nmsatker');
+            }
+            return datatables()->of($data)->make(true);
+        }
+        $kdwilayah = DB::table('wilayah')
+            ->select("*")
+            ->get();
+        return view('wilayah', compact('kdwilayah'));
+    }
+
+
     public function filter(Request $request)
     {
         if (request()->ajax()) {
-            if ($request->balai) {
+            if ($request->kdbalai) {
                 $data = DB::table('satker')
                     ->join('balai', 'satker.balai_id', '=', 'balai.id')
                     ->select('balai.id', 'balai.nmbalai', 'satker.nmsatker')
-                    ->where('satker.balai_id', $request->balai);
+                    ->where('satker.balai_id', $request->kdbalai);
             } else {
                 $data = DB::table('satker')
                     ->join('balai', 'satker.balai_id', '=', 'balai.id')
@@ -49,10 +73,33 @@ class PaketController extends Controller
             }
             return datatables()->of($data)->make(true);
         }
-        $databalai = DB::table('balai')
+        $kdbalai = DB::table('balai')
             ->select("*")
             ->get();
-        return view('paket-filter-all', compact('databalai'));
+        return view('paket-filter-all', compact('kdbalai'));
+    }
+
+    public function balaipaket(Request $request)
+    {
+        if (request()->ajax()) {
+            if ($request->balaipaket) {
+                $data = DB::table('paket')
+                    ->join('satker', 'paket.kdsatker', '=', 'satker.kdsatker')
+                    ->join('balai', 'satker.balai_id', '=', 'balai.id')
+                    ->select('balai.nmbalai', 'paket.id', 'paket.nmpaket', 'paket.pagurmp', 'paket.keuangan', 'paket.progres_fisik')
+                    ->where('balai.id', $request->balaipaket);
+            } else {
+                $data = DB::table('paket')
+                    ->join('satker', 'paket.kdsatker', '=', 'satker.kdsatker')
+                    ->join('balai', 'satker.balai_id', '=', 'balai.id')
+                    ->select('balai.nmbalai', 'paket.id', 'paket.nmpaket', 'paket.pagurmp', 'paket.keuangan', 'paket.progres_fisik');
+            }
+            return datatables()->of($data)->make(true);
+        }
+        $balaipaket = DB::table('balai')
+            ->select("*")
+            ->get();
+        return view('paket-filter-balaipaket', compact('balaipaket'));
     }
 
     /**

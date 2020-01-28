@@ -21,3 +21,5 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('column-searching', 'PaketController@index')->name('column-searching');
 Route::get('column-balai', 'PaketController@filter')->name('column-balai');
+Route::get('column-balai-paket', 'PaketController@balaipaket')->name('column-balai-paket');
+Route::get('column-wilayah', 'PaketController@wilayah')->name('column-wilayah');
